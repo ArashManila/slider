@@ -3,9 +3,7 @@ body {
   background: #000;
 }
 
-* {
-  margin: 0;
-}
+
 
 .slider {
   width: 500px;
@@ -15,39 +13,14 @@ body {
   margin: 0 auto;
   position: relative;
   margin-top: 2rem;
+  
 }
 
-.test{
-  position: absolute;
-  width: 40px;
-  height: 20px;
-  top:50%;
-  left:50%;
-  background-color: transparent;
-  color:black;
-  font-size:60px;
-  backdrop-filter: blur(50px);
-  box-shadow: 0px 0px 100px 0px rgba(0, 0, 0, 0.8);
-  background: rgba(255, 255, 255, 0.05);
-  z-index:2;
-}
 
 .prev-button {
-  cursor: pointer;
-  width: 90px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 6px solid #fff;
-  background: transparent;
-  color: #fff;
-  position: absolute;
-  left: 14px;
-  z-index: 30;
-  margin-top: 88%;
-  box-shadow: 3px 3px 3px #000;
+  left: 4%;
 }
-
-.next-button {
+.button{
   cursor: pointer;
   width: 48px;
   aspect-ratio: 1;
@@ -56,11 +29,17 @@ body {
   background: transparent;
   color: #fff;
   position: absolute;
-  right: 14px;
-  z-index: 30;
-  margin-top: 88%;
+  z-index: 1;
   box-shadow: 3px 3px 3px #000;
   font-size: 1.2rem;
+  margin-top: 88%;
+
+}
+
+
+.next-button {
+  right: 4%;
+  
 }
 
 .slider img {
