@@ -36,7 +36,7 @@ function initSlider  () {
   slide.src = "./Images/" + images[0];
   slide.id = `pic-${0}`;
 
-  SliderPlace.append(img);
+  SliderPlace.append(slide);
   SlideGeneration(images.length - 1, false, true);
   SlideGeneration(1, true, true);
   AddPagination();
@@ -68,9 +68,9 @@ function SlideGeneration (ind, isNextSlide){
   slide.id = `pic-${index}`;
 
   if (isNextSlide) {
-    SliderPlace.append(img);
+    SliderPlace.append(slide);
   } else {
-    SliderPlace.prepend(img);
+    SliderPlace.prepend(slide);
   }
 };
 
