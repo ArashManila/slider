@@ -21,7 +21,7 @@ SliderPlace.style.width = images.length * widthOffset + "px";
 SliderPlace.style.height = widthOffset + "px";
 SliderPlace.style.left = images.length !== 1 ? "-" + widthOffset + "px" : 0;
 
-
+let isAnimationEnd =true;
 let createPaginationButton = (id) => {
   const PaginationButton = document.createElement("div");
   PaginationButton.className = "pagination-button";
@@ -31,10 +31,10 @@ let createPaginationButton = (id) => {
 };
 
 function initSlider  () {
-  const img = document.createElement("img");
-  img.alt = "";
-  img.src = "./Images/" + images[0];
-  img.id = `pic-${0}`;
+  const slide = document.createElement("img");
+  slide.alt = "";
+  slide.src = "./Images/" + images[0];
+  slide.id = `pic-${0}`;
 
   SliderPlace.append(img);
   SlideGeneration(images.length - 1, false, true);
@@ -47,86 +47,96 @@ function AddPagination  () {
   
   paginations[0].classList.add("active");
 
-  paginations.forEach((circle, index) => {
-    circle.addEventListener("click", () => {
+  paginations.forEach((paginationButton, index) => {
+    paginationButton.addEventListener("click", () => {
+      if(!isAnimationEnd) return;
+      isAnimationEnd=!isAnimationEnd;
       ChangeSlide(index);
     });
   });
 };
 
-function SlideGeneration (ind, flag){
+function SlideGeneration (ind, isNextSlide){
   let index = ind;
   if (index > images.length - 1) index = 0;
-  else if (index == 0 && flag === false) index = 0;
-  else if (index + 1 === 0 && flag === false) index = images.length - 1;
+  else if (index == 0 && isNextSlide === false) index = 0;
+  else if (index + 1 === 0 && isNextSlide === false) index = images.length - 1;
 
-  const img = document.createElement("img");
-  img.alt = "";
-  img.src = "./Images/" + images[index];
-  img.id = `pic-${index}`;
+  const slide = document.createElement("img");
+  slide.alt = "";
+  slide.src = "./Images/" + images[index];
+  slide.id = `pic-${index}`;
 
-  if (flag) {
+  if (isNextSlide) {
     SliderPlace.append(img);
   } else {
     SliderPlace.prepend(img);
   }
 };
 
-function ChangeSlide (index) {
+function fadeOutAndRemoveSlide(slideElement, callback) {
+  let opacity = 1; 
+  let startTime = Date.now(); // Время начала анимации
+  
+  let fadeOutInterval = setInterval(() => {
+    let timeElapsed = Date.now() - startTime; // Время, прошедшее с начала анимации
+    opacity = 1 - (timeElapsed / 1000) + 0.35; // Уменьшаем opacity от 1 до 0.35 за 1 секунду
+    
+    slideElement.style.opacity = opacity; // Применяем новую прозрачность
+
+    if (timeElapsed >= 1000) {
+      clearInterval(fadeOutInterval); // Останавливаем анимацию
+      if (callback) callback(); 
+    }
+  }, 20); 
+}
+
+function ChangeSlide(index) {
   if (index !== activeImage) {
     RemoveActivePagination(activeImage);
+    ToggleActivePagination(index);
 
     let PrevImage = activeImage === 0 ? images.length - 1 : activeImage - 1;
     let NextImage = activeImage === images.length - 1 ? 0 : activeImage + 1;
 
-    document.querySelector(`#pic-${PrevImage}`).remove();
-    document.querySelector(`#pic-${activeImage}`).remove();
-    document.querySelector(`#pic-${NextImage}`).remove();
+    const currentSlide = document.querySelector(`#pic-${activeImage}`);
+    
+    fadeOutAndRemoveSlide(currentSlide, () => {
+      
+      document.querySelector(`#pic-${PrevImage}`).remove();
+      document.querySelector(`#pic-${activeImage}`).remove();
+      document.querySelector(`#pic-${NextImage}`).remove();
+      activeImage = index;
+      
 
-    activeImage = index;
+      SlideGeneration(index, true, false);
+      SlideGeneration(index - 1, false, false);
+      SlideGeneration(index + 1, true, false);
+      isAnimationEnd=true;
 
-    SlideGeneration(index, true, false);
-    SlideGeneration(index - 1, false, false);
-    SlideGeneration(index + 1, true, false);
-
-    ToggleActivePagination();
+    });
   }
 };
+function nextSlide() {
+  if(!isAnimationEnd) return;
+  isAnimationEnd=!isAnimationEnd;
+  const nextIndex = (activeImage + 1) % images.length;
+  ChangeSlide(nextIndex);
+}
 
-function nextSlide(){
+function prevSlide() {
+  if(!isAnimationEnd) return;
+  isAnimationEnd=!isAnimationEnd;
+  const prevIndex = activeImage === 0 ? images.length - 1 : activeImage - 1;
+  ChangeSlide(prevIndex);
+}
 
-    activeImage++;
-    if (activeImage >= images.length) activeImage = 0;
-    RemoveActivePagination(images.length - 1);
-
-    document.querySelector(".slider-line img").remove();
-    SlideGeneration(activeImage + 1, true, false);
-
-    ToggleActivePagination();
-    if (activeImage != 0) RemoveActivePagination(activeImage - 1);
-  
+function ToggleActivePagination (index){
+  paginations[index].classList.add("active");
 };
 
-function prevSlide () {
-    activeImage--;
-    if (activeImage < 0) activeImage = images.length - 1;
-    if (activeImage - 1 < 0) activeImage = 0;
-    RemoveActivePagination(0);
-
-    document.querySelector(".slider-line img:last-child").remove();
-    SlideGeneration(activeImage - 1, false, false);
-
-    ToggleActivePagination();
-    if (activeImage != images.length - 1) RemoveActivePagination(activeImage + 1);
-  
-};
-
-function ToggleActivePagination (){
-  paginations[activeImage].classList.add("active");
-};
-
-function RemoveActivePagination (ind){
-  paginations[ind].classList.remove("active");
+function RemoveActivePagination (index){
+  paginations[index].classList.remove("active");
 };
 
 initSlider();
